@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGP ISP Commands Reference</title>
+<style>
+body{font-family:Arial, Helvetica, sans-serif;background:#0f172a;color:#e5e7eb;margin:0;padding:40px}
+h1{color:#38bdf8}
+h2{margin-top:30px;color:#22c55e}
+pre{background:#020617;padding:15px;border-radius:10px;overflow:auto;border:1px solid #1e293b}
+.container{max-width:1000px;margin:auto}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>BGP ISP Command Reference</h1>
+
+<h2>1. Basic ISP BGP Process</h2>
+<pre>
+router bgp &lt;ASN&gt;
+bgp log-neighbor-changes
+bgp router-id &lt;router-id&gt;
+no bgp default ipv4-unicast
+timers bgp 30 90
+</pre>
+
+<h2>2. Neighbor Configuration</h2>
+<pre>
+neighbor &lt;IP&gt; remote-as &lt;ASN&gt;
+neighbor &lt;IP&gt; description &lt;PEER-NAME&gt;
+neighbor &lt;IP&gt; update-source &lt;interface&gt;
+neighbor &lt;IP&gt; password &lt;password&gt;
+neighbor &lt;IP&gt; ebgp-multihop &lt;hops&gt;
+neighbor &lt;IP&gt; send-community
+neighbor &lt;IP&gt; send-community both
+neighbor &lt;IP&gt; soft-reconfiguration inbound
+</pre>
+
+<h2>3. Address Family Activation</h2>
+<pre>
+address-family ipv4
+neighbor &lt;IP&gt; activate
+neighbor &lt;IP&gt; next-hop-self
+neighbor &lt;IP&gt; route-map &lt;MAP-NAME&gt; in
+neighbor &lt;IP&gt; route-map &lt;MAP-NAME&gt; out
+neighbor &lt;IP&gt; prefix-list &lt;LIST-NAME&gt; in
+neighbor &lt;IP&gt; prefix-list &lt;LIST-NAME&gt; out
+exit-address-family
+</pre>
+
+<h2>4. Route Advertisement</h2>
+<pre>
+network &lt;network-ip&gt; mask &lt;subnet-mask&gt;
+aggregate-address &lt;network&gt; &lt;mask&gt; summary-only
+redistribute connected
+redistribute static
+</pre>
+
+<h2>5. Local Preference</h2>
+<pre>
+route-map SET-LOCALPREF permit 10
+set local-preference 200
+</pre>
+
+<h2>6. MED</h2>
+<pre>
+route-map SET-MED permit 10
+set metric 50
+</pre>
+
+<h2>7. AS Path Prepending</h2>
+<pre>
+route-map PREPEND permit 10
+set as-path prepend &lt;ASN&gt; &lt;ASN&gt; &lt;ASN&gt;
+</pre>
+
+<h2>8. Communities</h2>
+<pre>
+route-map SET-COMMUNITY permit 10
+set community &lt;ASN:VALUE&gt;
+neighbor &lt;IP&gt; send-community
+neighbor &lt;IP&gt; send-community both
+</pre>
+
+<h2>9. Prefix Filtering</h2>
+<pre>
+ip prefix-list CUSTOMER-IN permit &lt;prefix&gt;/&lt;length&gt;
+ip prefix-list CUSTOMER-IN deny 0.0.0.0/0 le 32
+</pre>
+
+<h2>10. Maximum Prefix Protection</h2>
+<pre>
+neighbor &lt;IP&gt; maximum-prefix 1000
+</pre>
+
+<h2>11. Route Reflector</h2>
+<pre>
+neighbor &lt;IP&gt; route-reflector-client
+bgp cluster-id &lt;cluster-id&gt;
+</pre>
+
+<h2>12. BGP Dampening</h2>
+<pre>
+bgp dampening
+</pre>
+
+<h2>13. Default Route Advertisement</h2>
+<pre>
+neighbor &lt;IP&gt; default-originate
+</pre>
+
+<h2>14. BGP Authentication</h2>
+<pre>
+neighbor &lt;IP&gt; password &lt;PASSWORD&gt;
+</pre>
+
+<h2>15. BFD Fast Failover</h2>
+<pre>
+neighbor &lt;IP&gt; fall-over bfd
+</pre>
+
+<h2>16. Verification Commands</h2>
+<pre>
+show ip bgp summary
+show ip bgp
+show ip bgp neighbors
+show ip bgp neighbors &lt;IP&gt; advertised-routes
+show ip bgp neighbors &lt;IP&gt; received-routes
+show ip bgp regexp
+show ip bgp community
+show ip bgp dampening parameters
+show ip bgp flap-statistics
+</pre>
+
+<h2>17. Troubleshooting</h2>
+<pre>
+debug ip bgp
+debug ip bgp updates
+clear ip bgp *
+clear ip bgp &lt;neighbor-ip&gt;
+clear ip bgp &lt;neighbor-ip&gt; soft in
+clear ip bgp &lt;neighbor-ip&gt; soft out
+</pre>
+
+</div>
+</body>
+</html>
