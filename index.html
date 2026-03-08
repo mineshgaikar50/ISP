@@ -3,146 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BGP ISP Commands Reference</title>
+<title>BGP Engineer Cheat Sheet</title>
 <style>
-body{font-family:Arial, Helvetica, sans-serif;background:#0f172a;color:#e5e7eb;margin:0;padding:40px}
-h1{color:#38bdf8}
-h2{margin-top:30px;color:#22c55e}
-pre{background:#020617;padding:15px;border-radius:10px;overflow:auto;border:1px solid #1e293b}
-.container{max-width:1000px;margin:auto}
+body{font-family:Arial, Helvetica, sans-serif;background:#0f172a;color:#e5e7eb;margin:0}
+header{background:#020617;padding:15px 30px;border-bottom:1px solid #1e293b;position:sticky;top:0}
+h1{margin:0;color:#38bdf8}
+nav{margin-top:10px}
+nav button{background:#1e293b;color:#e5e7eb;border:none;padding:10px 16px;margin-right:10px;border-radius:6px;cursor:pointer}
+nav button:hover{background:#334155}
+section{padding:40px;max-width:1000px;margin:auto}
+h2{color:#22c55e;margin-top:20px}
+pre{background:#020617;padding:15px;border-radius:10px;border:1px solid #1e293b;overflow:auto}
+ul{line-height:1.8}
+.hidden{display:none}
 </style>
+<script>
+function showSection(id){
+ document.getElementById('commands').classList.add('hidden');
+ document.getElementById('scenarios').classList.add('hidden');
+ document.getElementById('troubleshoot').classList.add('hidden');
+ document.getElementById(id).classList.remove('hidden');
+}
+</script>
 </head>
 <body>
-<div class="container">
-<h1>BGP ISP Command Reference</h1>
 
-<h2>1. Basic ISP BGP Process</h2>
+<header>
+<h1>BGP Network Engineer Reference</h1>
+<nav>
+<button onclick="showSection('commands')">BGP Commands</button>
+<button onclick="showSection('scenarios')">Troubleshooting Scenarios</button>
+<button onclick="showSection('troubleshoot')">Troubleshooting Commands</button>
+</nav>
+</header>
+
+<section id="commands">
+<h2>Basic BGP Configuration</h2>
 <pre>
-router bgp &lt;ASN&gt;
+router bgp <ASN>
 bgp log-neighbor-changes
-bgp router-id &lt;router-id&gt;
-no bgp default ipv4-unicast
-timers bgp 30 90
+bgp router-id <router-id>
+neighbor <IP> remote-as <ASN>
+neighbor <IP> description <PEER>
+neighbor <IP> update-source <interface>
+neighbor <IP> ebgp-multihop <hops>
+neighbor <IP> password <password>
 </pre>
 
-<h2>2. Neighbor Configuration</h2>
-<pre>
-neighbor &lt;IP&gt; remote-as &lt;ASN&gt;
-neighbor &lt;IP&gt; description &lt;PEER-NAME&gt;
-neighbor &lt;IP&gt; update-source &lt;interface&gt;
-neighbor &lt;IP&gt; password &lt;password&gt;
-neighbor &lt;IP&gt; ebgp-multihop &lt;hops&gt;
-neighbor &lt;IP&gt; send-community
-neighbor &lt;IP&gt; send-community both
-neighbor &lt;IP&gt; soft-reconfiguration inbound
-</pre>
-
-<h2>3. Address Family Activation</h2>
+<h2>Address Family</h2>
 <pre>
 address-family ipv4
-neighbor &lt;IP&gt; activate
-neighbor &lt;IP&gt; next-hop-self
-neighbor &lt;IP&gt; route-map &lt;MAP-NAME&gt; in
-neighbor &lt;IP&gt; route-map &lt;MAP-NAME&gt; out
-neighbor &lt;IP&gt; prefix-list &lt;LIST-NAME&gt; in
-neighbor &lt;IP&gt; prefix-list &lt;LIST-NAME&gt; out
+neighbor <IP> activate
+neighbor <IP> next-hop-self
+neighbor <IP> route-map <MAP> in
+neighbor <IP> route-map <MAP> out
+neighbor <IP> prefix-list <LIST> in
+neighbor <IP> prefix-list <LIST> out
 exit-address-family
 </pre>
 
-<h2>4. Route Advertisement</h2>
+<h2>Route Advertisement</h2>
 <pre>
-network &lt;network-ip&gt; mask &lt;subnet-mask&gt;
-aggregate-address &lt;network&gt; &lt;mask&gt; summary-only
+network <network> mask <mask>
+aggregate-address <network> <mask> summary-only
 redistribute connected
 redistribute static
 </pre>
 
-<h2>5. Local Preference</h2>
+<h2>Traffic Engineering</h2>
 <pre>
 route-map SET-LOCALPREF permit 10
 set local-preference 200
-</pre>
 
-<h2>6. MED</h2>
-<pre>
 route-map SET-MED permit 10
 set metric 50
-</pre>
 
-<h2>7. AS Path Prepending</h2>
-<pre>
 route-map PREPEND permit 10
-set as-path prepend &lt;ASN&gt; &lt;ASN&gt; &lt;ASN&gt;
+set as-path prepend <ASN> <ASN> <ASN>
 </pre>
 
-<h2>8. Communities</h2>
+<h2>Communities</h2>
 <pre>
 route-map SET-COMMUNITY permit 10
-set community &lt;ASN:VALUE&gt;
-neighbor &lt;IP&gt; send-community
-neighbor &lt;IP&gt; send-community both
+set community <ASN:VALUE>
+neighbor <IP> send-community
+neighbor <IP> send-community both
 </pre>
+</section>
 
-<h2>9. Prefix Filtering</h2>
-<pre>
-ip prefix-list CUSTOMER-IN permit &lt;prefix&gt;/&lt;length&gt;
-ip prefix-list CUSTOMER-IN deny 0.0.0.0/0 le 32
-</pre>
+<section id="scenarios" class="hidden">
+<h2>Real ISP BGP Troubleshooting Scenarios</h2>
+<ul>
+<li>BGP neighbor stuck in Idle state</li>
+<li>BGP neighbor stuck in Active state</li>
+<li>BGP session flapping intermittently</li>
+<li>Neighbor established but no prefixes received</li>
+<li>Prefix received but not installed in routing table</li>
+<li>Customer cannot reach internet although BGP is up</li>
+<li>Default route not advertised to downstream customer</li>
+<li>Full internet table not received from upstream</li>
+<li>Only partial routes received from provider</li>
+<li>Traffic going through wrong upstream ISP</li>
+<li>Route advertised but filtered by prefix list</li>
+<li>Route-map denying expected prefixes</li>
+<li>Maximum prefix limit exceeded shutting BGP session</li>
+<li>AS path prepend not affecting inbound traffic</li>
+<li>MED influencing wrong exit path</li>
+<li>Local preference misconfiguration inside ISP network</li>
+<li>Next-hop unreachable for received BGP routes</li>
+<li>iBGP route not propagated to other routers</li>
+<li>Route reflector not reflecting routes</li>
+<li>Cluster ID conflict in route reflector design</li>
+<li>BGP dampening suppressing customer routes</li>
+<li>Frequent route withdrawals causing instability</li>
+<li>High CPU due to excessive BGP updates</li>
+<li>MPLS L3VPN route not imported into VRF</li>
+<li>VPNv4 routes not exchanged between PE routers</li>
+</ul>
+</section>
 
-<h2>10. Maximum Prefix Protection</h2>
-<pre>
-neighbor &lt;IP&gt; maximum-prefix 1000
-</pre>
-
-<h2>11. Route Reflector</h2>
-<pre>
-neighbor &lt;IP&gt; route-reflector-client
-bgp cluster-id &lt;cluster-id&gt;
-</pre>
-
-<h2>12. BGP Dampening</h2>
-<pre>
-bgp dampening
-</pre>
-
-<h2>13. Default Route Advertisement</h2>
-<pre>
-neighbor &lt;IP&gt; default-originate
-</pre>
-
-<h2>14. BGP Authentication</h2>
-<pre>
-neighbor &lt;IP&gt; password &lt;PASSWORD&gt;
-</pre>
-
-<h2>15. BFD Fast Failover</h2>
-<pre>
-neighbor &lt;IP&gt; fall-over bfd
-</pre>
-
-<h2>16. Verification Commands</h2>
+<section id="troubleshoot" class="hidden">
+<h2>Verification Commands</h2>
 <pre>
 show ip bgp summary
 show ip bgp
 show ip bgp neighbors
-show ip bgp neighbors &lt;IP&gt; advertised-routes
-show ip bgp neighbors &lt;IP&gt; received-routes
+show ip bgp neighbors <IP> advertised-routes
+show ip bgp neighbors <IP> received-routes
+show ip route bgp
+</pre>
+
+<h2>Advanced Inspection</h2>
+<pre>
 show ip bgp regexp
 show ip bgp community
 show ip bgp dampening parameters
 show ip bgp flap-statistics
 </pre>
 
-<h2>17. Troubleshooting</h2>
+<h2>Debug / Reset</h2>
 <pre>
 debug ip bgp
 debug ip bgp updates
 clear ip bgp *
-clear ip bgp &lt;neighbor-ip&gt;
-clear ip bgp &lt;neighbor-ip&gt; soft in
-clear ip bgp &lt;neighbor-ip&gt; soft out
+clear ip bgp <neighbor-ip>
+clear ip bgp <neighbor-ip> soft in
+clear ip bgp <neighbor-ip> soft out
 </pre>
+</section>
 
-</div>
 </body>
 </html>
